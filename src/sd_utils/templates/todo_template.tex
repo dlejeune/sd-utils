@@ -1,0 +1,106 @@
+\documentclass[12pt]{article}
+
+\usepackage[utf8]{inputenc}
+
+\usepackage[margin=0.75in]{geometry}
+
+
+\usepackage[final]{pdfpages}
+
+\usepackage{setspace}
+
+\usepackage{hyperref}
+
+\usepackage{xstring}
+\usepackage{filecontents}
+
+\usepackage{xpatch}
+
+
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{amsmath}
+
+\usepackage{array}
+
+
+\usepackage{listings}
+\usepackage[breakable]{tcolorbox}
+\tcbuselibrary{listings}
+
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{wrapfig}
+\usepackage{longtable}
+\usepackage{multicol}
+\usepackage{fancyvrb}
+\usepackage{calc}
+\usepackage{enumitem}
+
+
+% \definecolor{codegray}{gray}{0.9}
+% \newcommand{\code}[1]{\colorbox{codegray}{\texttt{#1}}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+%\setstretch{1.1}
+
+\usepackage{caption}
+
+
+\setlength{\parindent}{0pt}
+\usepackage{xcolor}
+\usepackage{layouts}
+\usepackage[ddmmyyyy,hhmmss]{datetime}
+
+
+\definecolor{grey}{HTML}{969696}
+
+
+\newcommand{\newtitle}[1]{
+    \begin{center}
+        {\Huge\bfseries #1 }
+        
+        \vspace{2mm}
+    
+    \end{center}
+    }
+\newcommand{\newsubtitle}[1]{\begin{center}
+    {\color{grey}\Large\bfseries #1 }
+    
+    \vspace{1mm}
+\end{center}}
+
+
+
+\usepackage{fontspec}
+
+
+\defaultfontfeatures{Mapping=tex-text}
+\setmainfont{Verdana}
+
+\begin{document}
+
+
+\BLOCK{for patrol in data.keys()}
+\BLOCK{for scout in data[patrol].keys()}
+
+\newtitle{\VAR{scout}}
+\newsubtitle{\VAR{data[patrol][scout]["level"]}}
+
+\renewcommand{\arraystretch}{1.1}
+\begin{longtable}{p{5cm}p{10cm}}
+    \textbf{Theme} & \textbf{Task} \\ \toprule
+    \BLOCK{for item in data[patrol][scout]["tasks"] }
+    \VAR{item[0]}  & \VAR{item[1]} \\ \midrule
+    \BLOCK{endfor}
+\end{longtable}
+
+\clearpage
+\BLOCK{endfor}
+\BLOCK{endfor}
+
+
+
+
+
+\end{document}
