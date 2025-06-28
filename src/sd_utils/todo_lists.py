@@ -4,54 +4,57 @@ from pathlib import Path
 import jinja2
 import numpy as np
 import pandas as pd
+from rich import print
 
 TEMPLATE_DIR = Path(
     "/home/dlejeune/Documents/scouts/dashboard/src/dashboard/todo_templates/"
 )
 
 
-def make_todo(raw_adv_chart: Path):
+def make_todo(raw_adv_chart: Path, output_location: Path):
     adv_chart_df = parse_advancement_chart(raw_adv_chart)
 
     todo_dict = build_todo_dict(adv_chart_df, "all")
-    hydrate_templates(
-        Path("/home/dlejeune/Documents/scouts/dashboard/temp/womp.tex"), todo_dict
-    )
+    print(__name__)
+
+    hydrate_templates(output_location, todo_dict)
     pass
 
 
-def hydrate_templates(output_file: Path, data: dict):
+def hydrate_templates(output_file: Path, data: dict, keep_tex: bool = False):
     latex_jinja_env = jinja2.Environment(
-        block_start_string="\BLOCK{",
+        block_start_string="\\BLOCK{",
         block_end_string="}",
-        variable_start_string="\VAR{",
+        variable_start_string="\\VAR{",
         variable_end_string="}",
-        comment_start_string="\#{",
+        comment_start_string="\\#{",
         comment_end_string="}",
         line_statement_prefix="%%",
         line_comment_prefix="%#",
         trim_blocks=True,
         autoescape=False,
-        loader=jinja2.FileSystemLoader(TEMPLATE_DIR),
+        loader=jinja2.PackageLoader("todo_lists"),
     )
 
     template = latex_jinja_env.get_template("todo_template.tex")
 
-    with output_file.open("w") as file:
+    with output_file.with_suffix(".tex").open("w") as file:
         file.write(template.render(data=data))
 
-    try:
-        result = subprocess.run(
-            f"latexmk -xelatex -interaction=nonstopmode {output_file}",
-            shell=True,
-            cwd=output_file.parent,
-        )
+    result = subprocess.call(
+        f"latexmk -xelatex -interaction=batchmode {output_file}",
+        shell=True,
+        cwd=output_file.parent,
+    )
 
-    except subprocess.CalledProcessError as e:
-        print("ERROR")
-        print(e.returncode)
-        print(e.output)
-    pass
+    if result != 0:
+        exit(result)
+
+    subprocess.call(
+        "latexmk -c",
+        shell=True,
+        cwd=output_file.parent,
+    )
 
 
 def trim_name(name_str):
@@ -165,7 +168,10 @@ def build_todo_dict(df, scouts):
             }
 
             for row in df[(df["Patrol"] == patrol) & (df["Name"] == person)].iterrows():
+                theme = row[1]["Theme"]
+                if theme == "":
+                    theme = "Membership"
                 out[patrol][person]["tasks"].append(
-                    (row[1]["Requirement"], row[1]["Requirement"].replace("&", "\\&"))
+                    (theme, row[1]["Requirement"].replace("&", "\\&"))
                 )
     return out

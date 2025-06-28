@@ -4,6 +4,7 @@ from pathlib import Path
 import advancement_charts as ac
 import typer
 from rich import print
+from todo_lists import make_todo
 from typing_extensions import Annotated
 
 app = typer.Typer()
@@ -15,7 +16,11 @@ class PivotDirection(enum.Enum):
     # V: str = "V"
 
 
-@app.command()
+@app.command(
+    "make-adv-chart",
+    help="Convert the downloadable advancement chart from scouts digital into something more aesthetically pleasing. Work in progress, very unpolished.",
+    no_args_is_help=True,
+)
 def cli_make_adv_chart(
     input_file: Annotated[Path, typer.Argument()],
     output_file: Annotated[Path, typer.Argument()],
@@ -36,6 +41,21 @@ def cli_make_adv_chart(
     chart_maker.create_advancement_sheets(
         input_file, output_file, is_input_full_export, pivot_direction.value
     )
+    print(f"Wrote output to [bold blue]{output_file}[/bold blue].")
+    pass
+
+
+@app.command(
+    "make-todo-list",
+    help="For each scout, produce a list of un-finished items in the form of a todo list. Requires the downloaded advancement chart.",
+    no_args_is_help=True,
+)
+def cli_make_todo(
+    input_file: Annotated[Path, typer.Argument()],
+    output_file: Annotated[Path, typer.Argument()],
+):
+    print(f"Reading advancement chart from [bold purple]{input_file}[/bold purple].")
+    make_todo(input_file, output_file)
     print(f"Wrote output to [bold blue]{output_file}[/bold blue].")
     pass
 

@@ -8,3 +8,8 @@ wheels/
 
 # Virtual environments
 .venv
+*.aux
+*.log
+*.pdf
+*.xdv
+*.out
