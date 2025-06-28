@@ -1,6 +1,10 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "sd-utils"
-version = "0.1.0"
+version = "0.1.1"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -11,3 +15,9 @@ dependencies = [
     "typer>=0.16.0",
     "xlsxwriter>=3.2.5",
 ]
+
+[project.scripts]
+sd-utils = "sd_utils:main.cli_entrypoint"
+
+[tool.setuptools.package-data]
+"sd_utils.templates" = ["*.tex"]

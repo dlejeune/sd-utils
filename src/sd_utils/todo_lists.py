@@ -33,7 +33,7 @@ def hydrate_templates(output_file: Path, data: dict, keep_tex: bool = False):
         line_comment_prefix="%#",
         trim_blocks=True,
         autoescape=False,
-        loader=jinja2.PackageLoader("todo_lists"),
+        loader=jinja2.PackageLoader("sd_utils.todo_lists"),
     )
 
     template = latex_jinja_env.get_template("todo_template.tex")
