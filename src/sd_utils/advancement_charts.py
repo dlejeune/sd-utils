@@ -44,6 +44,7 @@ class AdvancementUtils:
         else:
             return "background-color:white;color: white"
 
+    # TODO: This is duplicate code from the utils packae but don't have time for it now
     def read_sheet(self, filename, full_export):
         df = pd.read_excel(filename)
         df = df.drop(["Age", "Invested", "End"], axis=1)
@@ -75,8 +76,8 @@ class AdvancementUtils:
             "\n", n=2, expand=True
         )
 
-        df["Theme"] = df["Theme"].str.replace(" \(", "", regex=True)
-        df["Theme"] = df["Theme"].str.replace("\)", "", regex=True)
+        df["Theme"] = df["Theme"].str.replace(" \\(", "", regex=True)
+        df["Theme"] = df["Theme"].str.replace("\\)", "", regex=True)
 
         df[["Level", "Theme", "Patrol"]] = df[["Level", "Theme", "Patrol"]].astype(
             "category"
