@@ -4,7 +4,7 @@ This repo is a quick command-line wrapper around some hacky python code I wrote 
 
 ## Installation
 
-I use uv for installation. Life is too short to do anything otherwise:
+I use uv for installation. You'll need to [install that first](https://docs.astral.sh/uv/). Life is too short to do anything otherwise:
 
 ```
 uv tool install git+https://github.com/dlejeune/sd-utils
