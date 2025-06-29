@@ -20,4 +20,4 @@ The bane of everyone's existence. One of the tools (the todo-list generator) req
 
 When you install with uv, you get the command line tool `sd-utils`. Running `sd-utils --help` should provide an overview of the tool. 
 
-In a nutshell, there are two sub-commands: `make-adv-chart` and `make-todo-list`. These produce nicely-formatted advancement charts and todo lists respectively. They both consume the advancement chart export from scouts digital. In theory, you can provide it with the "minimal" export, but I sugest just doing a full export.
+In a nutshell, there are two main sub-commands: `make-adv-chart` and `make-todo-list`. These produce nicely-formatted advancement charts and todo lists respectively. They both consume the advancement chart export from scouts digital. In theory, you can provide it with the "minimal" export, but I sugest just doing a full export.
