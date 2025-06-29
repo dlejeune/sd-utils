@@ -44,13 +44,14 @@ def make_todo(
     output_location: Path,
     full_export: bool = True,
     scout_names: Optional[list[str]] = None,
+    num_levels: int = 1,
 ):
     adv_chart_df = parse_advancement_chart(raw_adv_chart, full_export)
 
     if not scout_names:
         scout_names = adv_chart_df["Name"].unique().tolist()
     print(scout_names)
-    todo_dict = build_todo_dict(adv_chart_df, scout_names)
+    todo_dict = build_todo_dict(adv_chart_df, scout_names, num_levels)
 
     hydrate_templates(output_location, todo_dict)
     pass
@@ -172,7 +173,7 @@ def parse_advancement_chart(file, full_export: bool = True):
     return adv_df
 
 
-def build_todo_dict(df, scouts: list[str]):
+def build_todo_dict(df, scouts: list[str], num_levels: int = 1):
     # cat_type = pd.CategoricalDtype(
     #     categories=["Membership", "Traveller", "Discoverer", "1st Class", "Springbok"],
     #     ordered=True,
@@ -180,14 +181,6 @@ def build_todo_dict(df, scouts: list[str]):
     df = df.loc[df["Passed"] == False, :]
 
     df = df[df["Name"].isin(scouts)]
-
-    # print(df.loc[df.groupby(["Patrol", "Name"], observed=True)["Level"].idxmin()])
-    df = df.merge(
-        df.loc[df.groupby(["Patrol", "Name"], observed=True)["Level"].idxmin()][
-            ["Patrol", "Name", "Level"]
-        ],
-        on=["Patrol", "Name", "Level"],
-    )
 
     out = {}
 
@@ -197,18 +190,26 @@ def build_todo_dict(df, scouts: list[str]):
         out[patrol] = {}
 
         for person in df[df["Patrol"] == patrol].groupby("Name").groups:
-            out[patrol][person] = {
-                "Level": df[(df["Patrol"] == patrol) & (df["Name"] == person)].iloc[0][
-                    "Level"
-                ],
-                "tasks": [],
-            }
-
-            for row in df[(df["Patrol"] == patrol) & (df["Name"] == person)].iterrows():
-                theme = row[1]["Theme"]
-                if theme == "":
-                    theme = "Membership"
-                out[patrol][person]["tasks"].append(
-                    (theme, row[1]["Requirement"].replace("&", "\\&"))
+            out[patrol][person] = []
+            person_df = df[(df["Patrol"] == patrol) & (df["Name"] == person)]
+            for idx, level in enumerate(person_df["Level"].unique()):
+                if idx == num_levels:
+                    break
+                out[patrol][person].append(
+                    {
+                        "Level": level,
+                        "tasks": [],
+                    }
                 )
+
+                for row in person_df.loc[
+                    person_df["Level"] == level, ["Theme", "Requirement"]
+                ].iterrows():
+                    theme = row[1]["Theme"]
+                    if theme == "":
+                        theme = "Membership"
+                    out[patrol][person][idx]["tasks"].append(
+                        (theme, row[1]["Requirement"].replace("&", "\\&"))
+                    )
+
     return out

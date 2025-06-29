@@ -83,19 +83,22 @@
 
 \BLOCK{for patrol in data.keys()}
 \BLOCK{for scout in data[patrol].keys()}
+\BLOCK{for scout_level in data[patrol][scout]}
+
 
 \newtitle{\VAR{scout}}
-\newsubtitle{\VAR{data[patrol][scout]["Level"]}}
+\newsubtitle{\VAR{scout_level["Level"]}}
 
 \renewcommand{\arraystretch}{1.1}
 \begin{longtable}{p{5cm}p{10cm}}
     \textbf{Theme} & \textbf{Task} \\ \toprule
-    \BLOCK{for item in data[patrol][scout]["tasks"] }
+    \BLOCK{for item in scout_level["tasks"] }
     \VAR{item[0]}  & \VAR{item[1]} \\ \midrule
     \BLOCK{endfor}
 \end{longtable}
 
 \clearpage
+\BLOCK{endfor}
 \BLOCK{endfor}
 \BLOCK{endfor}
 

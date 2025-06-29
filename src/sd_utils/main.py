@@ -12,7 +12,9 @@ from sd_utils.todo_lists import (
     write_full_scout_namefile,
 )
 
-app = typer.Typer()
+app = typer.Typer(
+    add_completion=False, help="Tool to manipulate the output of SD advancement charts."
+)
 
 
 class PivotDirection(enum.Enum):
@@ -32,8 +34,7 @@ def cli_make_adv_chart(
     is_input_full_export: Annotated[
         bool,
         typer.Option(
-            "--full",
-            "-f",
+            "--full/--minimal",
             help="Is the input file provided a full export or a minimal export",
         ),
     ] = True,
@@ -56,11 +57,37 @@ def cli_make_adv_chart(
     no_args_is_help=True,
 )
 def cli_make_todo(
-    input_file: Annotated[Path, typer.Argument()],
-    output_file: Annotated[Path, typer.Argument()],
-    full_export: Annotated[bool, typer.Option("--full/--minimal")] = True,
-    name_file: Annotated[Path, typer.Option()] = None,
-    names: Annotated[str, typer.Option()] = None,
+    input_file: Annotated[
+        Path, typer.Argument(help="Path to the excel file downloaded from SD.")
+    ],
+    output_file: Annotated[
+        Path,
+        typer.Argument(
+            help="Path to write the output file. Remember to include the filename, eg /path/to/output.pdf"
+        ),
+    ],
+    full_export: Annotated[
+        bool,
+        typer.Option(
+            "--full/--minimal",
+            help="Is this a full export (with dates) or a minimal export (with Xs)",
+        ),
+    ] = True,
+    num_levels: Annotated[
+        str, typer.Option(help="How many levels per scout to export.")
+    ] = 1,
+    name_file: Annotated[
+        Path,
+        typer.Option(
+            help="Optionally supply a plain text file with the names of scouts to make todo lists for. Note these names must match the 'short names'. See the get-names command for help"
+        ),
+    ] = None,
+    names: Annotated[
+        str,
+        typer.Option(
+            help="Provide a string of comma-separated values with the names of scouts to create todo lists for"
+        ),
+    ] = None,
 ):
     if name_file and names:
         print("[bold red]Please only supply one of name_file or names[/bold red]")
@@ -74,7 +101,9 @@ def cli_make_todo(
         print(names)
 
     print(f"Reading advancement chart from [bold purple]{input_file}[/bold purple].")
-    make_todo(input_file, output_file, full_export, scout_names=names)
+    make_todo(
+        input_file, output_file, full_export, scout_names=names, num_levels=num_levels
+    )
     print(f"Wrote output to [bold blue]{output_file}[/bold blue].")
     pass
 
