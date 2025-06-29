@@ -1,5 +1,8 @@
 # Scouts Digital Utilities 🛠️
 
+> [!NOTE]  
+> I'm putting this tool out there in the hopes that it's helpful to someone else. I don't really have time to polish into something usable beyond a commandline tool right now. I was hoping to either make it a webapp or a downloadable GUI but alas. If you want to contribute or change anything, feel free to make a PR.
+
 This repo is a quick command-line wrapper around some hacky python code I wrote to parse scouts digital data into more human- (or computer-) friendly formats. I make no guarantees any of this works beyond my machine (classic).
 
 ## Installation
