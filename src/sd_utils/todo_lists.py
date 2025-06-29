@@ -1,5 +1,6 @@
 import subprocess
 from pathlib import Path
+from typing import Optional
 
 import jinja2
 import numpy as np
@@ -11,11 +12,45 @@ TEMPLATE_DIR = Path(
 )
 
 
-def make_todo(raw_adv_chart: Path, output_location: Path, full_export: bool = True):
+def read_scout_name_file(input_file: Path) -> list[str]:
+    output: list[str] = []
+    with input_file.open("r") as fh:
+        for line in fh:
+            output.append(line.strip())
+
+    return output
+
+
+def write_full_scout_namefile(
+    advancement_chart: Path,
+    output_file: Optional[Path],
+    is_full_export: bool = True,
+) -> None:
+    adv_chart_df = parse_advancement_chart(advancement_chart, is_full_export)
+    names = sorted(adv_chart_df["Name"].unique().tolist())
+
+    print("[bold]Names of Scouts found in the provided advancement chart file[/bold]\n")
+    for name in names:
+        print(f"[bold blue]{name}[/bold blue]")
+
+    if output_file:
+        with output_file.open("w") as fh:
+            for name in names:
+                fh.write(f"{name}\n")
+
+
+def make_todo(
+    raw_adv_chart: Path,
+    output_location: Path,
+    full_export: bool = True,
+    scout_names: Optional[list[str]] = None,
+):
     adv_chart_df = parse_advancement_chart(raw_adv_chart, full_export)
 
-    todo_dict = build_todo_dict(adv_chart_df, "all")
-    print(__name__)
+    if not scout_names:
+        scout_names = adv_chart_df["Name"].unique().tolist()
+    print(scout_names)
+    todo_dict = build_todo_dict(adv_chart_df, scout_names)
 
     hydrate_templates(output_location, todo_dict)
     pass
@@ -137,15 +172,14 @@ def parse_advancement_chart(file, full_export: bool = True):
     return adv_df
 
 
-def build_todo_dict(df, scouts):
+def build_todo_dict(df, scouts: list[str]):
     # cat_type = pd.CategoricalDtype(
     #     categories=["Membership", "Traveller", "Discoverer", "1st Class", "Springbok"],
     #     ordered=True,
     # )
     df = df.loc[df["Passed"] == False, :]
 
-    if scouts != "all":
-        df = df[df["Name"] == scouts]
+    df = df[df["Name"].isin(scouts)]
 
     # print(df.loc[df.groupby(["Patrol", "Name"], observed=True)["Level"].idxmin()])
     df = df.merge(
