@@ -11,8 +11,8 @@ TEMPLATE_DIR = Path(
 )
 
 
-def make_todo(raw_adv_chart: Path, output_location: Path):
-    adv_chart_df = parse_advancement_chart(raw_adv_chart)
+def make_todo(raw_adv_chart: Path, output_location: Path, full_export: bool = True):
+    adv_chart_df = parse_advancement_chart(raw_adv_chart, full_export)
 
     todo_dict = build_todo_dict(adv_chart_df, "all")
     print(__name__)
@@ -42,7 +42,7 @@ def hydrate_templates(output_file: Path, data: dict, keep_tex: bool = False):
         file.write(template.render(data=data))
 
     result = subprocess.call(
-        f"latexmk -xelatex -interaction=batchmode {output_file}",
+        f"latexmk -xelatex -interaction=batchmode {output_file.with_suffix('.tex')}",
         shell=True,
         cwd=output_file.parent,
     )
@@ -64,7 +64,7 @@ def trim_name(name_str):
     return "{} {}".format(name_arr[0], initial)
 
 
-def parse_advancement_chart(file):
+def parse_advancement_chart(file, full_export: bool = True):
     df = pd.read_excel(file)
     df = df.drop(["Age", "Invested", "End"], axis=1)
     df = pd.melt(
@@ -72,19 +72,22 @@ def parse_advancement_chart(file):
     )
     df.fillna(value=False, inplace=True)
 
-    df[["Temp", "DatePassed", "Scouter"]] = df["Passed"].str.split(
-        "\n", n=2, expand=True
-    )
-    df = df.drop(["Temp"], axis=1)
-    df.loc[df["Passed"] != False, "Passed"] = True
-    df = df.replace({np.nan: None})
+    if full_export:
+        df[["Temp", "DatePassed", "Scouter"]] = df["Passed"].str.split(
+            "\n", n=2, expand=True
+        )
+        df = df.drop(["Temp"], axis=1)
+        df.loc[df["Passed"] != False, "Passed"] = True
+        df = df.replace({np.nan: None})
 
-    df[df["DatePassed"] != None]
-    df["DatePassed"] = df["DatePassed"].str.extract(
-        r"(\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$)", expand=False
-    )[0]
-    df["DatePassed"] = pd.to_datetime(df["DatePassed"])
-    df["Scouter"] = df["Scouter"].str.slice(start=3)
+        df[df["DatePassed"] != None]
+        df["DatePassed"] = df["DatePassed"].str.extract(
+            r"(\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$)", expand=False
+        )[0]
+        df["DatePassed"] = pd.to_datetime(df["DatePassed"])
+        df["Scouter"] = df["Scouter"].str.slice(start=3)
+    else:
+        df.loc[df["Passed"] == "X", "Passed"] = True
 
     df[["Name", "id"]] = df["Name"].str.split("\n", expand=True)
 

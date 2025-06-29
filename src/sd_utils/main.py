@@ -54,9 +54,10 @@ def cli_make_adv_chart(
 def cli_make_todo(
     input_file: Annotated[Path, typer.Argument()],
     output_file: Annotated[Path, typer.Argument()],
+    full_export: Annotated[bool, typer.Option("--full/--minimal")] = True,
 ):
     print(f"Reading advancement chart from [bold purple]{input_file}[/bold purple].")
-    make_todo(input_file, output_file)
+    make_todo(input_file, output_file, full_export)
     print(f"Wrote output to [bold blue]{output_file}[/bold blue].")
     pass
 
