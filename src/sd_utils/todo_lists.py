@@ -193,7 +193,7 @@ def build_todo_dict(df, scouts: list[str], num_levels: int = 1):
             out[patrol][person] = []
             person_df = df[(df["Patrol"] == patrol) & (df["Name"] == person)]
             for idx, level in enumerate(person_df["Level"].unique()):
-                if idx == num_levels:
+                if idx >= num_levels:
                     break
                 out[patrol][person].append(
                     {
