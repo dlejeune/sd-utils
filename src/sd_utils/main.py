@@ -74,7 +74,7 @@ def cli_make_todo(
         ),
     ] = True,
     num_levels: Annotated[
-        str, typer.Option(help="How many levels per scout to export.")
+        int, typer.Option(help="How many levels per scout to export.")
     ] = 1,
     name_file: Annotated[
         Path,
