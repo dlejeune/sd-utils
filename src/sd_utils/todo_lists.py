@@ -181,6 +181,7 @@ def build_todo_dict(df, scouts: list[str], num_levels: int = 1):
     df = df.loc[df["Passed"] == False, :]
 
     df = df[df["Name"].isin(scouts)]
+    df = df.loc[df["Level"] != "Membership", :]
 
     out = {}
 
